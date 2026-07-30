@@ -7,6 +7,13 @@ version being cut, so you never rename that heading by hand. See
 
 ## Unreleased
 
+- Fixed: `server.json`'s description was 116 characters, and the MCP Registry rejects anything over 100.
+  v0.1.0 therefore published to PyPI and created its GitHub Release, then failed at the registry step —
+  which cannot be re-run, because the workflow checks out the immovable tag. Shortened to 93 characters.
+- Added: `tests/test_server_json.py` validates `server.json` against the registry's constraints in CI,
+  minutes before a release rather than during one. The description limit is not in the JSON schema the
+  file references, so nothing else in the toolchain catches it.
+
 ## 0.1.0 - 2026-07-30
 
 - Added: initial release. A single `calculate` tool evaluating arithmetic expressions against a
