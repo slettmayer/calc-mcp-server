@@ -36,6 +36,22 @@ current is enforced, not optional.
 - **Detail in `docs/domain`**: anything domain-specific needing the same.
 - **Directory-scoped `AGENTS.md`**: conventions that only apply in that directory.
 
+### Domain doc layout
+
+Domain docs are **per-concept** — one entity, flow, lifecycle, or integration per file, each indexed in
+`docs/domain/README.md`. This repo currently has exactly one (`OVERVIEW.md`), which is correct for a
+one-tool server with no persistent state and no second bounded context.
+
+Split `OVERVIEW.md` into per-concept files, reducing it to an index, when either becomes true:
+
+- a second tool is added, or
+- the expression surface or compatibility constraints outgrow the tables they now fit in.
+
+Until then, keep domain detail in `OVERVIEW.md` rather than creating a thin second file. `OVERVIEW.md`
+must always carry a **tool surface and audiences** section naming the transport and which consumer reaches
+the tool how — that boundary *is* the domain knowledge, so naming the real tool and endpoint there is
+correct even though domain docs otherwise avoid implementation names.
+
 ## Naming Conventions
 
 - `/docs` files: `UPPERCASE-KEBAB-CASE.md` (e.g., `TECH-STACK.md`, `ARCHITECTURE.md`).

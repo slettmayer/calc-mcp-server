@@ -45,6 +45,18 @@ publishes to PyPI via Trusted Publishing, creates the GitHub Release, and publis
 `server.json`'s version is rewritten from the tag at publish time, so the `0.1.0` in the committed file is
 a placeholder and does not need updating.
 
+### The registry validates after PyPI, so validate before both
+
+The registry publish is the **last** step, and it only checks `server.json` at that point — after the PyPI
+upload has succeeded and the tag is immovable. A rejection there cannot be fixed by re-running the job; it
+costs a version number.
+
+`tests/test_server_json.py` front-runs those checks in CI. Run
+`uv run pytest tests/test_server_json.py` after touching `server.json`, the README's `mcp-name` marker, or
+the distribution name — see
+[Validating the registry manifest](TESTING.md#validating-the-registry-manifest) for what each case guards
+and which release it was written after.
+
 ### The first release
 
 `v0.1.0` must be cut by **manual dispatch with the version set explicitly**. A `feat/*` branch does not
@@ -55,8 +67,8 @@ Before it can succeed, two things must exist and cannot be created from this rep
 
 - a **pending publisher** on PyPI for `calc-mcp-server`, pointing at `slettmayer/calc-mcp-server`,
   workflow `release.yml`, environment `pypi`
-- the `GH_ACTION_APP_ID` and `GH_ACTION_APP_PRIVATE_KEY` repository secrets, for the App that pushes the
-  changelog commit past the `main` ruleset
+- the `GH_ACTION_APP_CLIENT_ID` and `GH_ACTION_APP_PRIVATE_KEY` repository secrets, for the App that
+  pushes the changelog commit past the `main` ruleset
 
 ## What Dependabot triggers
 

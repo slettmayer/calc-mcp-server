@@ -7,6 +7,11 @@ version being cut, so you never rename that heading by hand. See
 
 ## Unreleased
 
+- Changed: `auto-release.yml` now passes `client-id` to `actions/create-github-app-token` instead of the
+  deprecated `app-id`, reading a new `GH_ACTION_APP_CLIENT_ID` secret. Every run warned
+  `Input 'app-id' has been deprecated`; the token it mints is what pushes the changelog commit past the
+  `main` ruleset, so the input will not be left to be removed on the action's schedule.
+
 ## 0.1.2 - 2026-07-30
 
 - Fixed: the README was missing the `<!-- mcp-name: io.github.slettmayer/calc-mcp-server -->` marker the

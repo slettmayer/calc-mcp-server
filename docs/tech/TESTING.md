@@ -19,13 +19,18 @@ Documents the test structure, patterns, tooling, and conventions used in the pro
 ### Test Structure
 ```
 tests/
+  conftest.py               -- puts `scripts/` on sys.path so release tooling is importable
   test_evaluator.py         -- the acceptance matrix, the caps, result rendering
   test_server.py            -- the MCP tool function, called directly
   test_stdio.py             -- end-to-end round trip over the real stdio transport
+  test_server_json.py       -- `server.json` against the MCP Registry's constraints
   test_changelog_release.py -- release tooling, git faked
 ```
 
 Everything runs in CI. There is no `integration` marker, because nothing external is contacted.
+
+`conftest.py` exists only so `test_changelog_release.py` can import `scripts/changelog_release.py`, which
+ships outside the package and is therefore not importable by default.
 
 ### The acceptance matrix
 
@@ -78,6 +83,20 @@ script in at once does not work: closing stdin cancels the session's task group 
 call still in flight, so only the initialize response ever comes back. If these tests start returning
 "no response with id 2", that is the cause.
 
+### Validating the registry manifest
+
+`test_server_json.py` checks `server.json` against constraints the MCP Registry only enforces at publish
+time — which is *after* the PyPI upload has succeeded and the tag is immovable, so a rejection there
+cannot be fixed by re-running the job. It costs a whole version number.
+
+That is not hypothetical: `v0.1.0` reached PyPI and then failed the registry with
+`expected length <= 100` on a 116-character description. The tests cover the description limit, the
+package identifier matching `pyproject.toml`'s distribution name, the owned `io.github.slettmayer`
+namespace, the `mcp-name` ownership marker in the README, and the two version fields agreeing.
+
+Neither the referenced JSON schema nor anything else in the toolchain catches these, so the suite is the
+only pre-release gate. See [RELEASING.md](RELEASING.md) for how the versions get rewritten from the tag.
+
 ### Async Testing
 - `pytest-asyncio` with `asyncio_mode = "auto"` in `pyproject.toml`
 - Tests still carry explicit `@pytest.mark.asyncio` decorators for clarity
@@ -115,3 +134,6 @@ No mocking library is needed: the evaluator is pure, and the stdio tests use the
 - New rendering behavior → add to the "Result rendering" section of `test_evaluator.py`.
 - New tool or changed tool signature → add to `test_stdio.py`, not just `test_server.py`. The protocol
   surface is what consumers actually see.
+- Editing `server.json`, the README's `mcp-name` marker, or the distribution name → run
+  `uv run pytest tests/test_server_json.py` before merging. A registry constraint that is only discovered
+  at publish time burns a version number.
