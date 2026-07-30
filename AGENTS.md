@@ -67,12 +67,29 @@ See [Domain Overview](docs/domain/OVERVIEW.md) for the tool contract, the suppor
 and why this repo exists.
 
 ## Structural Risks
-- **The server key `calculator` and the tool name `calculate` are load-bearing.** Home Assistant agent prompts route to `calculator__calculate` and an existing HA config entry points at `/servers/calculator/sse`. Renaming either breaks live voice agents -- see [OVERVIEW.md](docs/domain/OVERVIEW.md)
-- **Never let a dependency go unbounded.** An unbounded `mcp>=1.4.1` in the package this replaces is what caused the outage this repo exists to prevent; `uv.lock` must be regenerated in the same commit as any `pyproject.toml` dependency change or `uv sync --locked` fails CI
-- Widening `ALLOWED_FUNCTIONS` widens the attack surface -- any addition needs a cap review, since `factorial` needed one and `pow` needed another
-- The caps in `const.py` are tuned to CPython's 4300-digit int-to-string limit; a runtime that changes that limit makes `MAX_RESULT_DIGITS` arbitrary rather than principled
-- `MathError` wraps the stdlib's own message, whose wording differs between Python versions (3.12 says "math domain error", 3.14 says "expected a nonnegative input") -- tests assert the type, not the text
-- Tool functions are called directly in tests, which relies on `@mcp.tool()` returning the function undecorated. That held across the v1 -> v2 migration; a future SDK returning a wrapper breaks the tests loudly rather than silently
+- **The server key `calculator` and the tool name `calculate` are load-bearing.** Home Assistant agent
+  prompts route to `calculator__calculate` and an existing HA config entry points at
+  `/servers/calculator/sse`. Renaming either breaks live voice agents -- see
+  [OVERVIEW.md](docs/domain/OVERVIEW.md)
+- **Never let a dependency go unbounded.** An unbounded `mcp>=1.4.1` in the package this replaces is what
+  caused the outage this repo exists to prevent; `uv.lock` must be regenerated in the same commit as any
+  `pyproject.toml` dependency change or `uv sync --locked` fails CI
+- **The MCP Registry validates `server.json` only at publish time**, after PyPI has the version and the tag
+  is immovable -- a rejection costs a version number, which is what `v0.1.0` cost.
+  `tests/test_server_json.py` front-runs those checks in CI -- see [RELEASING.md](docs/tech/RELEASING.md)
+- Widening `ALLOWED_FUNCTIONS` widens the attack surface -- any addition needs a cap review, since
+  `factorial` needed one and `pow` needed another
+- The caps in `const.py` are tuned to CPython's 4300-digit int-to-string limit; a runtime that changes that
+  limit makes `MAX_RESULT_DIGITS` arbitrary rather than principled
+- A saturating float overflow (`1e308 * 10`) returns the literal string `inf` rather than an `Error:` line,
+  so a voice agent reads it aloud as an answer -- see [OVERVIEW.md](docs/domain/OVERVIEW.md)
+- `MathError` wraps the stdlib's own message, whose wording differs between Python versions (3.12 says
+  "math domain error", 3.14 says "expected a nonnegative input") -- tests assert the type, not the text
+- Tool functions are called directly in tests, which relies on `@mcp.tool()` returning the function
+  undecorated. That held across the v1 -> v2 migration; a future SDK returning a wrapper breaks the tests
+  loudly rather than silently
+- `scripts/` deliberately breaks the `src/` error-handling rules (stderr + exit code, its own
+  `ChangelogError`). Do not "fix" it to match -- see [CONVENTIONS.md](docs/tech/CONVENTIONS.md)
 
 ## Detailed Guides
 - [Technical Context](docs/tech/README.md) -- architecture, safe evaluation, tech stack, conventions, testing

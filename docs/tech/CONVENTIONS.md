@@ -8,6 +8,7 @@ Documents naming, code style, error handling, and import patterns.
 - Import ordering and style
 - The error-handling contract between layers
 - Docstring and comment expectations
+- Where `scripts/` release tooling deliberately diverges from the `src/` rules
 
 ## Non-Responsibilities
 - Module boundaries (see [ARCHITECTURE.md](ARCHITECTURE.md))
@@ -47,6 +48,9 @@ Caps are named `MAX_*` and carry their unit in the docstring or comment, not the
 
 The contract, in one sentence: **`evaluator.py` raises, `server.py` catches, the tool never raises.**
 
+This applies to `src/`. `scripts/` is release tooling and deliberately follows a different contract — see
+[Release tooling](#release-tooling) below.
+
 - Every exception `evaluate()` can provoke is translated into a `CalculatorError` subclass. Bare stdlib
   exceptions must not escape it.
 - Exception messages are lowercase, complete sentences without a trailing period, and describe what was
@@ -70,6 +74,20 @@ The contract, in one sentence: **`evaluator.py` raises, `server.py` catches, the
   [SAFE-EVALUATION.md](SAFE-EVALUATION.md) at length.
 - The `calculate` tool docstring is the tool description the LLM sees. Keep it tight and concrete: it is
   how the agent decides whether to reach for the calculator at all.
+
+### Release tooling
+
+`scripts/changelog_release.py` ships outside the package and is a command-line tool, not part of the
+server. It keeps the shared style rules — `from __future__ import annotations`, import order, full
+annotations, ruff formatting — but departs on error handling, deliberately:
+
+| Rule in `src/` | In `scripts/` | Why |
+|---|---|---|
+| `_LOGGER` with `%s` formatting | `print(f"error: {err}", file=sys.stderr)` | A CLI's output *is* its interface; a workflow log reads stderr, not a logging config |
+| Raise `CalculatorError` subclasses | Raise `ChangelogError(Exception)` | A different domain. Subclassing `CalculatorError` would let `server.py` swallow a release failure as an `Error:` line |
+| Exceptions propagate to the caller | `main()` catches and returns exit code `1` | The workflow step's pass/fail signal is the process exit code |
+
+Do not "fix" `scripts/` to match `src/`. See [RELEASING.md](RELEASING.md) for what the script does.
 
 ## Known Risks
 - The "never coerce to float" rule is not enforced by anything except review and

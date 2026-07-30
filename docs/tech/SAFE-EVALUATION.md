@@ -61,15 +61,18 @@ other server in the same process.
 
 ## The caps
 
-All five live in `const.py`. Each is checked before the expensive work, never after.
+Four caps and one precision constant live in `const.py`. Every **cap** is checked before the expensive
+work, never after — it rejects. `RESULT_PRECISION` is not a cap: it is rendering precision, applied
+unconditionally to every float result and rejecting nothing. It is listed here because it shares the file
+and is easy to mistake for a bound.
 
 | Cap | Value | Where | Why this value |
 |---|---|---|---|
 | `MAX_EXPRESSION_LENGTH` | 500 chars | `evaluate()`, before parsing | A cheap first gate, so a pathological input never gets an AST built for it |
 | `MAX_AST_DEPTH` | 32 | `_evaluate()`, per level | Bounds the walk's recursion. Far deeper than anything a person types — redundant parentheses produce no nodes, so `((((1))))` is 1 level |
-| `MAX_RESULT_DIGITS` | 4300 | `_guarded_pow()` and `format_result()` | CPython's default int-to-string limit. A larger result could not be rendered anyway, which makes this the principled line rather than an arbitrary one |
+| `MAX_RESULT_DIGITS` | 4300 | `_guarded_pow()`, `format_result()` | CPython's default int-to-string limit. A larger result could not be rendered anyway, so the line is principled, not arbitrary |
 | `MAX_FACTORIAL_ARG` | 1000 | `_evaluate_call()` | 1000! has 2568 digits and computes in well under a millisecond. 2000! has 5736 and so exceeds `MAX_RESULT_DIGITS` regardless |
-| `RESULT_PRECISION` | 12 sig. digits | `format_result()` | Not a safety cap. IEEE-754 noise appears around the 16th digit, so 12 hides it while keeping more precision than a calculator result is used at |
+| `RESULT_PRECISION` | 12 sig. digits | `format_result()` | Not a safety cap. IEEE-754 noise appears near the 16th digit, so 12 hides it while keeping more precision than a result is read at |
 
 ### Why the exponent cap is on the estimated result, not the exponent
 
@@ -100,9 +103,14 @@ Do not re-propose these; each was evaluated and ruled out.
 |---|---|
 | `ast.literal_eval` | Not an expression evaluator. Literals and containers only — it cannot do `2 + 2` |
 | `eval()` with restricted globals | Escapable via `().__class__.__bases__` chains. There is no safe version of this |
-| `simpleeval` | Purpose-built and sound, but reintroduces exactly the thing this repo exists to remove: an unbounded third-party dependency in the voice stack. It also only covers part of the problem — its `MAX_POWER` handles the exponent bomb, but the factorial cap would still be hand-rolled |
+| `simpleeval` | Sound, but reintroduces an unbounded third-party dependency — see below |
 | `asteval` | Supports statements and assignments. Much broader attack surface for no gain |
 | `sympy` | Multi-megabyte, and `sympify` has historically leaned on `eval` |
+
+`simpleeval` is the closest call, so it is worth being explicit about. It is purpose-built and sound, but
+it reintroduces exactly the thing this repo exists to remove: an unbounded third-party dependency in the
+voice stack. It also covers only part of the problem — its `MAX_POWER` handles the exponent bomb, but the
+factorial cap would still be hand-rolled here.
 
 ## Known Risks
 - The allowlists are the security boundary. Adding to `ALLOWED_FUNCTIONS` needs a cap review — two of
