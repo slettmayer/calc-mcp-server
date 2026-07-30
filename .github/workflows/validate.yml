@@ -39,7 +39,11 @@ jobs:
       # --locked installs the committed uv.lock exactly and fails if it has
       # drifted from pyproject.toml, so dependency bumps are actually tested.
       - run: uv sync --locked
-      - run: uv run pytest tests/ -v -m "not integration"
+      # The whole suite runs here: unlike the sibling servers this one contacts
+      # nothing external, so there is no `integration` marker to deselect. That
+      # includes the stdio round trip, which is the check that would have caught
+      # the import break this repo exists to prevent.
+      - run: uv run pytest tests/ -v
 
   # Advisory only. Deliberately absent from `gate`'s needs so it can never block
   # a merge — the goal is to surface a forgotten entry while it is still cheap to

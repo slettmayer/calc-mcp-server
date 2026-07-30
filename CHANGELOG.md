@@ -22,3 +22,7 @@ version being cut, so you never rename that heading by hand. See
   A unit-tested evaluator behind broken MCP wiring is precisely the failure that motivated this repo.
 - Changed: floats render at 12 significant digits, so `0.1 + 0.2` reads `0.3` rather than
   `0.30000000000000004`. Whole floats keep their `.0`, so `8 / 2` stays visibly distinct from `4`.
+- Fixed: the CI test step no longer passes `-m "not integration"`. This repo contacts nothing external
+  and so defines no `integration` marker, and the flag disagreed with the `pytest tests/ -v` documented
+  in `AGENTS.md` and `TESTING.md` — the kind of drift that makes CI look like it covers more than it
+  does.
