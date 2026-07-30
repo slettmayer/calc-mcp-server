@@ -109,17 +109,17 @@ a spoken question, and both propagate silently through the rest of an expression
 | Integer arithmetic | Exact integer of any size, up to 4300 digits | `123456789 * 987654321` → `121932631112635269`, not a rounded float |
 | Float arithmetic | 12 significant digits | `0.1 + 0.2` → `0.3`, not `0.30000000000000004` |
 | Whole float | Keeps `.0` | `8 / 2` → `4.0`, visibly distinct from the exact integer `4` |
-| Overflowed float | `inf` or `nan` | Returned as-is, *not* as an `Error:` line — see below |
+| Non-finite float | `inf` or `nan` | Returned as-is, *not* as an `Error:` line — see below |
 | Rejected | `Error: <reason>` | Read aloud by a voice agent, so the reason is plain English |
 
 The int/float distinction is preserved deliberately. `4` and `4.0` mean different things here: the first
 is exact, the second is the result of a division that happened to come out whole.
 
-`inf` and `nan` are absent from the **constants** allowlist, but they can still arrive as computed
-*results*: float addition and multiplication saturate to `inf` instead of raising, so `1e308 * 10` renders
-`inf` and `1e308 * 10 - 1e308 * 10` renders `nan`. Only the paths that raise `OverflowError` — `2.0 **
-10000`, `exp(1000)` — become `Error:` lines. This is a known gap rather than a designed behavior; see
-Known Risks.
+`inf` and `nan` are absent from the **constants** allowlist, but either can still arrive as a computed
+*result*. Float addition and multiplication saturate to `inf` rather than raising, so `1e308 * 10` renders
+`inf`; subtracting two infinities then yields `nan`, so `1e308 * 10 - 1e308 * 10` renders `nan`. Only the
+paths that raise `OverflowError` — `2.0 ** 10000`, `exp(1000)` — become `Error:` lines. This is a known gap
+rather than a designed behavior; see Known Risks.
 
 ## Glossary
 
@@ -137,7 +137,7 @@ Known Risks.
 - The expression surface is what agents discover through the tool docstring. Widening it without
   updating that docstring means the capability exists but is never used. The docstring currently
   advertises three of the five operator aliases, omitting `·` and `−`.
-- A saturating float overflow returns the literal string `inf` or `nan` rather than an `Error:` line, so a
+- A non-finite float result returns the literal string `inf` or `nan` rather than an `Error:` line, so a
   voice agent reads "inf" aloud as though it were an answer. Returning a rejection instead would be the
   consistent behavior; it has not been changed because it would alter the tool's output contract.
 

@@ -61,10 +61,13 @@ other server in the same process.
 
 ## The caps
 
-Four caps and one precision constant live in `const.py`. Every **cap** is checked before the expensive
-work, never after — it rejects. `RESULT_PRECISION` is not a cap: it is rendering precision, applied
-unconditionally to every float result and rejecting nothing. It is listed here because it shares the file
-and is easy to mistake for a bound.
+Four caps and one precision constant live in `const.py`. Every **cap** rejects rather than truncates, and
+is checked before the expensive work wherever that is possible. `MAX_RESULT_DIGITS` is the one that cannot
+be: it is enforced before exponentiating *and* again at render, because multiplication can grow an integer
+past it without ever touching `**` — see [below](#why-the-digit-cap-is-also-enforced-at-render).
+
+`RESULT_PRECISION` is not a cap: it is rendering precision, applied unconditionally to every float result
+and rejecting nothing. It is listed here because it shares the file and is easy to mistake for a bound.
 
 | Cap | Value | Where | Why this value |
 |---|---|---|---|
