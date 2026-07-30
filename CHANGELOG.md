@@ -7,6 +7,8 @@ version being cut, so you never rename that heading by hand. See
 
 ## Unreleased
 
+## 0.1.0 - 2026-07-30
+
 - Added: initial release. A single `calculate` tool evaluating arithmetic expressions against a
   hand-rolled AST allowlist, replacing the abandoned `mcp-server-calculator` (last commit 2025-05-10),
   whose unbounded `mcp>=1.4.1` made `uvx …@latest` resolve the v2 SDK, crash on the removed
@@ -26,3 +28,4 @@ version being cut, so you never rename that heading by hand. See
   and so defines no `integration` marker, and the flag disagreed with the `pytest tests/ -v` documented
   in `AGENTS.md` and `TESTING.md` — the kind of drift that makes CI look like it covers more than it
   does.
+
