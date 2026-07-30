@@ -134,9 +134,9 @@ rather than a designed behavior; see Known Risks.
 ## Known Risks
 - The `calculator` / `calculate` names are referenced from a live Home Assistant instance, not from any
   file in this repo. Nothing here will fail if they change; the voice agents will.
-- The expression surface is what agents discover through the tool docstring. Widening it without
-  updating that docstring means the capability exists but is never used. The docstring currently
-  advertises three of the five operator aliases, omitting `·` and `−`.
+- The expression surface is what agents discover through the tool docstring. Widening it without updating
+  that docstring means the capability exists but is never used. `test_docstring_advertises_every_operator_alias`
+  guards the aliases specifically; constants and functions are still review-only.
 - A non-finite float result returns the literal string `inf` or `nan` rather than an `Error:` line, so a
   voice agent reads "inf" aloud as though it were an answer. Returning a rejection instead would be the
   consistent behavior; it has not been changed because it would alter the tool's output contract.

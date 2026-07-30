@@ -70,6 +70,12 @@ v1 and still true in v2.
 If a future SDK returns a `Tool` wrapper, these tests fail at the call, loudly. That is intended: the
 alternative is tests that silently exercise a wrapper instead of the tool.
 
+The same file also guards the *advertised* surface:
+`test_docstring_advertises_every_operator_alias` asserts every key of `OPERATOR_ALIASES` appears in the
+`calculate` docstring. An alias the evaluator accepts but the description omits is a capability no agent
+will ever send — which is what happened to `·` and `−`. Constants and functions have no equivalent guard
+yet and remain review-only.
+
 ### The stdio round trip
 
 `test_stdio.py` spawns `python -m calc_mcp_server.server` as a subprocess and speaks JSON-RPC to it over
