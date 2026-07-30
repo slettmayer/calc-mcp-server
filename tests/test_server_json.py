@@ -53,6 +53,20 @@ def test_name_uses_the_owned_github_namespace() -> None:
     assert _server_json()["name"] == "io.github.slettmayer/calc-mcp-server"
 
 
+def test_readme_carries_the_registry_ownership_marker() -> None:
+    """The registry proves PyPI ownership by finding this line in the README.
+
+    Without it the publish fails with "ownership validation failed" — and like
+    the description limit, only at publish time, after PyPI already has the
+    version. It must be the README that ships in the distribution, which
+    `pyproject.toml`'s `readme` field points at.
+    """
+    readme_name = _pyproject()["project"]["readme"]
+    readme = (REPO_ROOT / readme_name).read_text()
+    marker = f"mcp-name: {_server_json()['name']}"
+    assert marker in readme, f"{readme_name} must contain '{marker}'"
+
+
 def test_versions_agree_with_each_other() -> None:
     """Both are placeholders rewritten from the tag, but they must start equal.
 
