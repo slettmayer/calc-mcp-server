@@ -7,6 +7,8 @@ version being cut, so you never rename that heading by hand. See
 
 ## Unreleased
 
+## 0.1.2 - 2026-07-30
+
 - Fixed: the README was missing the `<!-- mcp-name: io.github.slettmayer/calc-mcp-server -->` marker the
   MCP Registry uses to prove PyPI ownership, so v0.1.1 published to PyPI and then failed the registry
   with "ownership validation failed". Both sibling servers carry it; a fresh README did not.
