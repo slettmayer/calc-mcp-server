@@ -7,6 +7,8 @@ version being cut, so you never rename that heading by hand. See
 
 ## Unreleased
 
+## 0.1.1 - 2026-07-30
+
 - Fixed: `server.json`'s description was 116 characters, and the MCP Registry rejects anything over 100.
   v0.1.0 therefore published to PyPI and created its GitHub Release, then failed at the registry step —
   which cannot be re-run, because the workflow checks out the immovable tag. Shortened to 93 characters.
