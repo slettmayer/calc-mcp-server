@@ -1,0 +1,11 @@
+# Technical Context
+
+Index of technical documentation files for AI-assisted development. Loaded on demand when a task touches the corresponding topic.
+
+## Contents
+- [Tech Stack](TECH-STACK.md) -- languages, frameworks, build tools, dependency policy
+- [Architecture](ARCHITECTURE.md) -- project structure, layering, module boundaries, data flow
+- [Safe Evaluation](SAFE-EVALUATION.md) -- the threat model, the allowlist, and every resource cap
+- [Conventions](CONVENTIONS.md) -- naming, code style, error handling, import patterns
+- [Testing](TESTING.md) -- test frameworks, patterns, conventions, commands
+- [Releasing](RELEASING.md) -- how versions are tagged and published, and where changelog entries go

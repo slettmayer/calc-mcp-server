@@ -1,0 +1,85 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ruff:
+    name: Ruff (lint + format)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      # ruff comes from the dev group in the committed uv.lock, so CI lints with
+      # the exact version used locally. `pip install ruff` was unpinned, meaning
+      # a ruff release could fail the build without any change to this repo.
+      # --only-group keeps the project itself out of the env (linting does not
+      # need it installed); --no-sync then stops `uv run` from putting it back,
+      # which would build via hatch-vcs and so need the full git history.
+      - run: uv sync --locked --only-group dev
+      - run: uv run --no-sync ruff check .
+      - run: uv run --no-sync ruff format . --check
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # hatch-vcs derives the version from git history + tags
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      # --locked installs the committed uv.lock exactly and fails if it has
+      # drifted from pyproject.toml, so dependency bumps are actually tested.
+      - run: uv sync --locked
+      - run: uv run pytest tests/ -v -m "not integration"
+
+  # Advisory only. Deliberately absent from `gate`'s needs so it can never block
+  # a merge — the goal is to surface a forgotten entry while it is still cheap to
+  # add, not to add ceremony to dependency bumps or docs-only PRs.
+  changelog:
+    name: Changelog reminder
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
+      !contains(github.event.pull_request.labels.*.name, 'no-changelog')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # need the base ref to diff against
+      - name: Warn when src changed without a changelog entry
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          changed=$(git diff --name-only "$BASE" "$HEAD")
+          if grep -q '^src/' <<< "$changed" && ! grep -qx 'CHANGELOG.md' <<< "$changed"; then
+            echo "::warning::This PR changes src/ but not CHANGELOG.md. Add an entry under '## Unreleased', or label the PR 'no-changelog'."
+          else
+            echo "Changelog check satisfied."
+          fi
+
+  gate:
+    name: gate
+    needs: [ruff, test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check validation results
+        run: |
+          if [[ "${{ needs.ruff.result }}" == "success" && \
+                "${{ needs.test.result }}" == "success" ]]; then
+            echo "All checks passed"
+            exit 0
+          else
+            echo "One or more checks failed"
+            exit 1
+          fi

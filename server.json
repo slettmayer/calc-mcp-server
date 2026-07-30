@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.slettmayer/calc-mcp-server",
+  "title": "Calculator",
+  "description": "Exact arithmetic MCP server: one safe calculator tool over an AST allowlist, with integer results exact at any size.",
+  "websiteUrl": "https://github.com/slettmayer/calc-mcp-server",
+  "repository": {
+    "url": "https://github.com/slettmayer/calc-mcp-server",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "calc-mcp-server",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

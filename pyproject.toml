@@ -1,0 +1,81 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "calc-mcp-server"
+dynamic = ["version"]
+description = "MCP server for exact arithmetic: a single safe calculator tool over an AST allowlist, with no unbounded dependencies."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+authors = [{ name = "Stefan Lettmayer" }]
+keywords = [
+    "mcp",
+    "model-context-protocol",
+    "calculator",
+    "arithmetic",
+    "math",
+    "safe-eval",
+    "home-assistant",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+# Exactly one runtime dependency, upper-bounded. An unbounded `mcp>=1.4.1` in
+# the abandoned server this replaces is what took the whole MCP proxy down when
+# the SDK's v2 release removed `mcp.server.fastmcp`.
+dependencies = [
+    "mcp[cli]>=2,<3",
+]
+
+[project.urls]
+Homepage = "https://github.com/slettmayer/calc-mcp-server"
+Repository = "https://github.com/slettmayer/calc-mcp-server"
+Issues = "https://github.com/slettmayer/calc-mcp-server/issues"
+Changelog = "https://github.com/slettmayer/calc-mcp-server/blob/main/CHANGELOG.md"
+
+[project.scripts]
+calc-mcp-server = "calc_mcp_server.server:main"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/calc_mcp_server/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/calc_mcp_server"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-asyncio>=1.3.0",
+    "ruff>=0.16.0",
+]
