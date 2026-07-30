@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import pytest
 
+from calc_mcp_server.const import OPERATOR_ALIASES
 from calc_mcp_server.server import calculate
 
 
@@ -42,3 +43,22 @@ async def test_calculate_returns_an_error_line_instead_of_raising(
     result = await calculate(expression)
     assert result.startswith("Error: ")
     assert fragment in result
+
+
+# --- The advertised surface -------------------------------------------------
+
+
+def test_docstring_advertises_every_operator_alias() -> None:
+    """The docstring is the tool description the model reads to decide what to send.
+
+    An alias that exists in `OPERATOR_ALIASES` but goes unmentioned here is a
+    capability no agent will ever use — the surface was widened for nothing.
+    This caught `·` and `−` being omitted after both were added to `const.py`.
+    """
+    docstring = calculate.__doc__
+    assert docstring is not None
+    missing = [alias for alias in OPERATOR_ALIASES if alias not in docstring]
+    assert not missing, (
+        f"aliases accepted by the evaluator but absent from the tool docstring: "
+        f"{missing}. An agent cannot use what the description does not mention."
+    )

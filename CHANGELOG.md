@@ -7,6 +7,12 @@ version being cut, so you never rename that heading by hand. See
 
 ## Unreleased
 
+- Fixed: the `calculate` tool docstring advertised three of the five operator aliases, omitting `·` and
+  `−` (U+2212). The docstring is the tool description the model reads, so both were accepted by the
+  evaluator but no agent would ever send them — a speech-to-text layer producing either got a capability
+  that existed only on paper.
+- Added: a test asserting every key of `OPERATOR_ALIASES` appears in the tool docstring, so widening the
+  alias table without advertising it now fails CI instead of going unnoticed.
 - Changed: `auto-release.yml` now passes `client-id` to `actions/create-github-app-token` instead of the
   deprecated `app-id`, reading a new `GH_ACTION_APP_CLIENT_ID` secret. Every run warned
   `Input 'app-id' has been deprecated`; the token it mints is what pushes the changelog commit past the

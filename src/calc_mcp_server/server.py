@@ -43,7 +43,8 @@ async def calculate(expression: str) -> str:
     Args:
         expression: The expression to evaluate, for example "2 + 3 * (4 - 1)",
             "sqrt(16) + sin(pi/2)" or "123456789 * 987654321". `^` is accepted
-            as a power operator, and `×` and `÷` as multiply and divide.
+            as a power operator; `×` and `·` as multiply, `÷` as divide, and
+            `−` (U+2212) as minus.
     """
     try:
         return format_result(evaluate(expression))
