@@ -49,13 +49,13 @@ a placeholder and does not need updating.
 
 The registry publish is the **last** step, and it only checks `server.json` at that point — after the PyPI
 upload has succeeded and the tag is immovable. A rejection there cannot be fixed by re-running the job; it
-costs a version number. `v0.1.0` shipped to PyPI and then failed with `expected length <= 100` on a
-116-character description.
+costs a version number.
 
-`tests/test_server_json.py` runs those checks in CI instead — description length, package identifier, the
-owned namespace, the README's `mcp-name` marker, and the two version fields agreeing. Run
-`uv run pytest tests/test_server_json.py` after touching `server.json`, the marker, or the distribution
-name. See [TESTING.md](TESTING.md) for what each case guards.
+`tests/test_server_json.py` front-runs those checks in CI. Run
+`uv run pytest tests/test_server_json.py` after touching `server.json`, the README's `mcp-name` marker, or
+the distribution name — see
+[Validating the registry manifest](TESTING.md#validating-the-registry-manifest) for what each case guards
+and which release it was written after.
 
 ### The first release
 
