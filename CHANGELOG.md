@@ -7,6 +7,14 @@ version being cut, so you never rename that heading by hand. See
 
 ## Unreleased
 
+- Fixed: the README was missing the `<!-- mcp-name: io.github.slettmayer/calc-mcp-server -->` marker the
+  MCP Registry uses to prove PyPI ownership, so v0.1.1 published to PyPI and then failed the registry
+  with "ownership validation failed". Both sibling servers carry it; a fresh README did not.
+- Added: a test asserting the marker is present and matches `server.json`'s name, alongside the
+  description-length check. Both failures share a shape — the registry only validates at publish time,
+  after the PyPI upload has already succeeded and the tag is immovable.
+- Added: PyPI, Python and licence badges, matching the sibling servers.
+
 ## 0.1.1 - 2026-07-30
 
 - Fixed: `server.json`'s description was 116 characters, and the MCP Registry rejects anything over 100.

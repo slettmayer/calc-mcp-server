@@ -1,5 +1,11 @@
 # Calculator MCP Server
 
+<!-- mcp-name: io.github.slettmayer/calc-mcp-server -->
+
+[![PyPI](https://img.shields.io/pypi/v/calc-mcp-server.svg)](https://pypi.org/project/calc-mcp-server/)
+[![Python](https://img.shields.io/pypi/pyversions/calc-mcp-server.svg)](https://pypi.org/project/calc-mcp-server/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 An MCP server that does arithmetic, exactly — so an LLM does not have to do it mentally.
 
 One tool, `calculate`, evaluating expressions against a hand-rolled AST allowlist. No `eval()`, no
