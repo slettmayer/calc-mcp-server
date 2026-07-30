@@ -14,8 +14,11 @@ context window on content that may not be relevant to the task. The architecture
 - **Directory-scoped `AGENTS.md`** (with a sibling `CLAUDE.md` pointer) — loaded when working in that directory.
 
 This gives the agent the right information at the right time without burning context on irrelevant
-detail. CodeRabbit reviews against these docs and requests changes when they go stale — so keeping them
-current is enforced, not optional.
+detail.
+
+Keeping the docs current is a **convention, not an enforced gate**: no bot reviews this repo, and CI checks
+only Ruff and pytest. A stale doc therefore fails silently — an agent reads it, believes it, and acts on it.
+That makes updating the matching `docs/` file in the same PR as the code change the whole safeguard.
 
 ## File Locations and Scope
 
@@ -63,7 +66,7 @@ correct even though domain docs otherwise avoid implementation names.
 - **`/AGENTS.md`**: <150 lines — if larger, content is leaking in that belongs in `docs/`.
 - **`/docs/**/*.md`**: <300 lines per file — split into focused files if larger.
 - **Directory-scoped `AGENTS.md`**: <100 lines — tightly scoped.
-- **Line length**: keep every line **under 200 characters** (CodeRabbit flags it). Hard-wrap prose; indent
+- **Line length**: keep every line **under 200 characters** (a review convention). Hard-wrap prose; indent
   bullet continuations; never wrap a table row — shorten the cell instead.
 
 ## Checklist: Adding a New Doc
@@ -94,4 +97,4 @@ correct even though domain docs otherwise avoid implementation names.
 | Using absolute paths in links | Use relative paths so links work regardless of clone location |
 | Duplicating content across docs | Put it in one place, cross-reference from others |
 | Letting a doc grow unbounded | Split into focused files when it exceeds ~300 lines |
-| A line over 200 characters | Hard-wrap it (CodeRabbit flags it) |
+| A line over 200 characters | Hard-wrap it, or shorten the table cell |
