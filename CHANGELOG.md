@@ -7,6 +7,8 @@ version being cut, so you never rename that heading by hand. See
 
 ## Unreleased
 
+## 0.1.3 - 2026-08-08
+
 - Fixed: the `calculate` tool docstring advertised three of the five operator aliases, omitting `·` and
   `−` (U+2212). The docstring is the tool description the model reads, so both were accepted by the
   evaluator but no agent would ever send them — a speech-to-text layer producing either got a capability
@@ -17,6 +19,7 @@ version being cut, so you never rename that heading by hand. See
   deprecated `app-id`, reading a new `GH_ACTION_APP_CLIENT_ID` secret. Every run warned
   `Input 'app-id' has been deprecated`; the token it mints is what pushes the changelog commit past the
   `main` ruleset, so the input will not be left to be removed on the action's schedule.
+- Build: bump ruff in the python-dependencies group.
 
 ## 0.1.2 - 2026-07-30
 
