@@ -7,6 +7,10 @@ version being cut, so you never rename that heading by hand. See
 
 ## Unreleased
 
+## 0.1.8 - 2026-09-09
+
+- Build: bump ruff in the python-dependencies group.
+
 ## 0.1.7 - 2026-08-28
 
 - Build: bump ruff in the python-dependencies group.
