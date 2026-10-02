@@ -82,12 +82,13 @@ GitHub Actions, three workflows:
 |---|---|---|
 | `validate.yml` | push to `main`, any PR | `ruff check` + `ruff format --check` + `pytest`, gated by a `gate` job |
 | `release.yml` | `v*` tag | Build, verify tag matches version, publish to PyPI (Trusted Publishing/OIDC), GitHub Release, MCP Registry |
-| `auto-release.yml` | merged `dependabot/uv/*` PR, or manual dispatch | Prepare changelog, commit, tag |
+| `auto-release.yml` | merged `dependabot/uv/*` PR that changed runtime dependencies, or manual dispatch | Prepare changelog, commit, tag |
+| `dependabot-auto-merge.yml` | Dependabot PR opened/updated | Enable squash auto-merge (lands once `gate` passes) |
 
 Both `validate` jobs use `astral-sh/setup-uv` with `uv sync --locked`. **Never `pip install -e .`** — it
 ignores `uv.lock` and resolves fresh, which is how the original breakage reached CI unnoticed.
 
-Dependabot runs weekly for the `uv` and `github-actions` ecosystems, grouped.
+Dependabot runs weekly for the `uv` (Mondays) and `github-actions` (Thursdays) ecosystems, grouped; its PRs auto-merge.
 
 ## Known Risks
 - A single runtime dependency means the `mcp` SDK's v3 release is the one upgrade that will ever matter
