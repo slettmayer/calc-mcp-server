@@ -82,7 +82,7 @@ GitHub Actions, three workflows:
 |---|---|---|
 | `validate.yml` | push to `main`, any PR | `ruff check` + `ruff format --check` + `pytest`, gated by a `gate` job |
 | `release.yml` | `v*` tag | Build, verify tag matches version, publish to PyPI (Trusted Publishing/OIDC), GitHub Release, MCP Registry |
-| `auto-release.yml` | merged `dependabot/uv/*` PR, or manual dispatch | Prepare changelog, commit, tag |
+| `auto-release.yml` | merged `dependabot/uv/*` PR that changed runtime dependencies, or manual dispatch | Prepare changelog, commit, tag |
 
 Both `validate` jobs use `astral-sh/setup-uv` with `uv sync --locked`. **Never `pip install -e .`** — it
 ignores `uv.lock` and resolves fresh, which is how the original breakage reached CI unnoticed.

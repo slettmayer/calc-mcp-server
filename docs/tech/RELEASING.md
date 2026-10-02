@@ -60,7 +60,7 @@ and which release it was written after.
 ### The first release
 
 `v0.1.0` must be cut by **manual dispatch with the version set explicitly**. A `feat/*` branch does not
-trigger `auto-release.yml` — only a merged `dependabot/uv/*` PR or a dispatch does — and leaving the input
+trigger a release — only a dispatch or a qualifying Dependabot PR does — and leaving the input
 empty would produce `v0.0.1`.
 
 Before it can succeed, two things must exist and cannot be created from this repo:
@@ -72,11 +72,20 @@ Before it can succeed, two things must exist and cannot be created from this rep
 
 ## What Dependabot triggers
 
-Merging a Dependabot PR from the **`uv`** ecosystem (`dependabot/uv/*`) auto-cuts a patch release — those
-change the published package. **`github-actions`** bumps do not; they merge without releasing.
+Merging a Dependabot PR releases **only if it changed what users install**. The *Classify* step in
+`auto-release.yml` runs `scripts/dependabot_release_kind.py` on `pyproject.toml` before and after the
+squash merge, and compares the runtime requirements — `[project].dependencies` and
+`optional-dependencies`:
 
-A dependency **major** bump deserves a deliberate minor release via dispatch rather than the automatic
-patch, since it changes what consumers resolve.
+- **unchanged → no release.** The usual case: a `uv` PR that touches `uv.lock` alone, or only the `dev`
+  group (ruff, pytest). The lock is not part of the wheel, so a release would publish an identical package
+  under a new version.
+- **a range moved within its major versions → patch release**
+- **a dependency added, removed, or crossing a major version → minor release**, since it changes what
+  consumers resolve
+
+`github-actions` bumps never start the job. A bump merged without a release ships with the next one, and
+`changelog_release.py` lists it there as a `- Build:` line.
 
 ## Changing the changelog script
 
