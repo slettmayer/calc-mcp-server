@@ -87,6 +87,13 @@ squash merge, and compares the runtime requirements — `[project].dependencies`
 `github-actions` bumps never start the job. A bump merged without a release ships with the next one, and
 `changelog_release.py` lists it there as a `- Build:` line.
 
+Every Dependabot PR also **merges itself**: `dependabot-auto-merge.yml` enables squash auto-merge, and the
+PR lands once `gate` passes; one that fails `gate` stays open for a human. It uses the GitHub App token
+rather than `GITHUB_TOKEN`, because a `GITHUB_TOKEN` merge triggers no workflows and `auto-release.yml`
+would never see it. The ruleset requires an up-to-date branch and auto-merge never updates one, so the
+`uv` and `github-actions` ecosystems run on different days (Monday, Thursday); a PR left behind by a
+feature merge needs `gh pr update-branch <n>` (see Gotchas).
+
 ## Changing the changelog script
 
 `scripts/changelog_release.py` is covered by `tests/test_changelog_release.py`, which fakes git so no
